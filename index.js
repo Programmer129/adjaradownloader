@@ -13,9 +13,9 @@ function parseUrl(url) {
 async function main(url) {
     const id = parseUrl(url);
     const body = JSON.parse(await send(`/api/v1/movies/${id}?source=adjaranet`));
-    console.info(body.data);
     const fileBody = await send(`/api/v1/movies/${body.data.id}/season-files/0?source=adjaranet`);
-    console.info(JSON.stringify(JSON.parse(fileBody)));
+    console.info(JSON.parse(fileBody).data[0].files[0].files[0]);
+    await send(`/api/v1/movies/2848/files/1395719`, true);
 }
 
 main('https://www.adjaranet.com/movies/1483/True-Lies?lang=ENG&quality=HD');
