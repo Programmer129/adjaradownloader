@@ -50,6 +50,7 @@ const simpleCallback = function (res, resolve, reject) {
 
 const downloadCallback = function (res, resolve, reject) {
     res.pipe(file);
+    resolve(true);
 };
 
 async function sendInternal(options, callback) {
@@ -64,12 +65,20 @@ async function sendInternal(options, callback) {
 async function send(path, download) {
     OPTIONS.path = path;
     if (download) {
-        file = fs.createWriteStream('movie.mp4');
-        return await sendInternal(OPTIONS, downloadCallback);
+        // file = fs.createWriteStream('movie.mp4');
+        // return await sendInternal(OPTIONS, downloadCallback);
     }
     return await sendInternal(OPTIONS, simpleCallback);
 }
 
+function streamFile(response, path) {
+    OPTIONS.path = path;
+    const request = https.request(OPTIONS, function (res) {
+        res.pipe(response);
+    });
+}
+
 module.exports = {
-    send
+    send,
+    streamFile
 }

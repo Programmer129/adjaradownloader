@@ -1,21 +1,25 @@
 `use strict`
 
-const {parse} = require('url');
-const {send} = require('./requests');
+const express = require('express');
+const bodyParser = require('body-parser');
+const timeout = require('connect-timeout');
+const routes = require('./routes');
 
-function parseUrl(url) {
-    const parsed = parse(url);
-    const parts = parsed.pathname.split("/").filter(p => p.length > 0);
+const app = express();
+const port = 3000;
 
-    return parts[1];
-}
+app.use(bodyParser.json());
+app.use(timeout('3600000'));
 
-async function main(url) {
-    const id = parseUrl(url);
-    const body = JSON.parse(await send(`/api/v1/movies/${id}?source=adjaranet`));
-    const fileBody = await send(`/api/v1/movies/${body.data.id}/season-files/0?source=adjaranet`);
-    console.info(JSON.parse(fileBody).data[0].files[0].files[0]);
-    await send(`/api/v1/movies/2848/files/1395719`, true);
-}
+app.use("/api", routes);
 
-main('https://www.adjaranet.com/movies/1483/True-Lies?lang=ENG&quality=HD');
+app.use(function(err, req, res, next) {
+    if (err.statusCode) {
+        return res.status(err.statusCode).json(err);
+    }
+    return res.status(500).json(err);
+});
+
+app.listen(port, () => {
+    console.info(`Application running on port: ${port}`);
+});
