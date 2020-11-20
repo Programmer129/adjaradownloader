@@ -10,8 +10,8 @@ function downloadURI(uri, name) {
 
 function downloadImage(url, name) {
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.setRequestHeader('Content-Disposition', 'inline');
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Content-Disposition', 'attachment');
     xhr.setRequestHeader('Content-Type', 'video/mp4');
     xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
     xhr.setRequestHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Origin");
@@ -35,5 +35,8 @@ function downloadImage(url, name) {
     xhr.onerror = err => {
         alert('Failed to download picture');
     };
-    xhr.send();
+    xhr.send(JSON.stringify({
+        movieId: "878496841",
+        fileId: "1397146"
+    }));
 }
