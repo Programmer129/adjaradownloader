@@ -21,7 +21,7 @@ function checkProgress() {
     xhr.send();
 }
 
-setTimeout(() => {
+setInterval(() => {
     if (poll) {
         checkProgress();
         console.log('tick')
@@ -46,6 +46,7 @@ function downloadMovie() {
         poll = false;
     };
     xhr.onerror = err => {
+        poll = false;
         alert('Failed to download movie');
     };
     xhr.send(JSON.stringify({
