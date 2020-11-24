@@ -1,7 +1,10 @@
 `use strict`
 
 const {parse} = require('url');
-const {send, streamFile} = require('./requests');
+const {v4: uuidv4} = require('uuid');
+const {send} = require('./requests');
+
+const PROGRESS = {};
 
 function mapQuality(quality) {
     switch (quality) {
@@ -80,15 +83,12 @@ async function fetch(url) {
         name,
         duration: byQuality.duration,
         quality: byQuality.quality,
-        language: byLang.lang
+        language: byLang.lang,
+        id: uuidv4()
     };
-}
-
-function download(response, movieId, fileId) {
-    streamFile(response, `/api/v1/movies/${movieId}/files/${fileId}`);
 }
 
 module.exports = {
     fetch,
-    download
+    PROGRESS
 }

@@ -6,7 +6,7 @@ const express = require("express");
 const mime = require('mime');
 const got = require('got');
 const {validate, Joi} = require('express-validation');
-const {fetch, download} = require('./adjaraParser');
+const {fetch, PROGRESS} = require('./adjaraParser');
 
 const router = express.Router();
 
@@ -19,8 +19,10 @@ const searchValidation = {
 
 const downloadValidation = {
     body: Joi.object({
-        movieId: Joi.string().optional(),
-        fileId: Joi.string().optional()
+        movieId: Joi.string().required(),
+        fileId: Joi.string().required(),
+        name: Joi.string().required(),
+        id: Joi.string().required()
     }),
 };
 
@@ -39,23 +41,23 @@ router.post("/search", validate(searchValidation, {}, {}), async (req, res, next
 
 router.post("/download", validate(downloadValidation, {}, {}), (req, res, next) => {
     try {
-        // const {movieId, fileId} = req.body;
-        // console.log(req.body);
+        const {movieId, fileId, name, id} = req.body;
 
-        const file = 'movie.mp4';
+        const file = `${name}.mp4`;
 
         const filename = path.basename(file);
         const mimetype = mime.getType(file);
 
         res.setHeader('Content-disposition', 'attachment; filename=' + filename);
         res.setHeader('Content-type', `${mimetype}; charset=UTF-8`);
-        const url = `https://api.adjaranet.com/api/v1/movies/${878496841}/files/${1397146}`;
+        const url = `https://api.adjaranet.com/api/v1/movies/${movieId}/files/${fileId}`;
 
         const stream = got.stream(url);
 
         stream
-            .on("downloadProgress", ({ transferred, total, percent }) => {
+            .on("downloadProgress", ({transferred, total, percent}) => {
                 const percentage = Math.round(percent * 100);
+                PROGRESS[id] = percentage;
                 console.info(`progress: ${transferred}/${total} (${percentage}%)`);
             })
             .on("error", (error) => {
@@ -71,7 +73,19 @@ router.post("/download", validate(downloadValidation, {}, {}), (req, res, next) 
             });
 
         stream.pipe(res);
-        // download(res, movieId, fileId);
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
+});
+
+router.get("/progress", (req, res, next) => {
+    try {
+        const {id} = req.query;
+
+        res.status(200).json({
+            progress: PROGRESS[id]
+        });
     } catch (e) {
         console.error(e);
         next(e);

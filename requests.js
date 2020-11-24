@@ -1,6 +1,5 @@
 `use strict`
 
-const fs = require('fs');
 const {https} = require('follow-redirects');
 
 const OPTIONS = {
@@ -21,8 +20,6 @@ const OPTIONS = {
     },
     'maxRedirects': 20
 };
-
-let file;
 
 const simpleCallback = function (res, resolve, reject) {
     const chunks = [];
@@ -48,11 +45,6 @@ const simpleCallback = function (res, resolve, reject) {
     })
 };
 
-const downloadCallback = function (res, resolve, reject) {
-    res.pipe(file);
-    resolve(true);
-};
-
 async function sendInternal(options, callback) {
     return new Promise((resolve, reject) => {
         const response = https.request(options, function (res) {
@@ -62,23 +54,11 @@ async function sendInternal(options, callback) {
     });
 }
 
-async function send(path, download) {
+async function send(path) {
     OPTIONS.path = path;
-    if (download) {
-        // file = fs.createWriteStream('movie.mp4');
-        // return await sendInternal(OPTIONS, downloadCallback);
-    }
     return await sendInternal(OPTIONS, simpleCallback);
 }
 
-function streamFile(response, path) {
-    OPTIONS.path = path;
-    const request = https.request(OPTIONS, function (res) {
-        res.pipe(response);
-    });
-}
-
 module.exports = {
-    send,
-    streamFile
+    send
 }

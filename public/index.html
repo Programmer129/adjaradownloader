@@ -26,18 +26,17 @@
                     <input id="search" type="text" placeholder="" value=""/>
                 </div>
             </div>
-            <div id="searchResult" style="display: none">
-                <p id="name"></p>
-                <p id="quality"></p>
-                <p id="language"></p>
-                <p id="duration"></p>
-                <button id="download">Download</button>
-            </div>
-<!--            <div class="suggestion-wrap">-->
-<!--            </div>-->
         </fieldset>
+        <p id="progress" style="display: none"></p>
+        <div id="searchResult" style="display: none">
+            <p id="name"></p>
+            <p id="quality"></p>
+            <p id="language"></p>
+            <p id="duration"></p>
+            <input id="download" type="button" value="Download" onclick="downloadMovie()"/>
+        </div>
     </form>
 </div>
-</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</body>
 <script src="js/main.js"></script>
 </html>
